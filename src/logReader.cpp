@@ -43,6 +43,9 @@ logReader::~logReader ( )
 
 vector<string> logReader::next(){
           vector<string> result;
+    if(fichier.eof()) {
+        return result;
+    }
           string line;
 
           getline(fichier,line);

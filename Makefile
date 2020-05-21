@@ -7,8 +7,8 @@ LIBS = -lm
 
 all: Airwatcher
 
-Airwatcher: src/main.c
-	g++ $(CFLAGS) -o bin/Airwatcher main.c $(LIBS)
+Airwatcher: ./src/main.cpp
+	g++ $(CFLAGS) -o bin/Airwatcher $^ $(LIBS)
 
 clean:
 	rm -f bin/*

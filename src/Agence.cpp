@@ -27,7 +27,7 @@ Mesure * Agence::accederDonnees()
 
 }
 
-float Agence::evaluerCapteur()
+float Agence::evaluerCapteur(Capteur & capt)
 {
     #ifdef MAP
         cout<<"Appel a la methode evaluerCapteur() de Agence" << endl;
@@ -43,7 +43,7 @@ float Agence::moyenne()
 
 }
 
-float Agence::comportementSimilaire()
+float Agence::comportementSimilaire(Capteur & capt)
 {
     #ifdef MAP
         cout<<"Appel a la methode comportementSimilaire() de Agence" << endl;

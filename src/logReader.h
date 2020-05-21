@@ -22,9 +22,6 @@ using namespace std;
 class logReader
 {
 public:
-    //Constructeurs de logMap
-	string nomfichier;
-    char delim;
 
 
     ifstream fichier;
@@ -33,6 +30,11 @@ public:
     //----------------------------------------------------- Méthodes publiques
     ~logReader ();
     vector<string> next();
+
+protected:
+    //Constructeurs de logMap
+	string nomfichier;
+    char delim;
 };
 
 

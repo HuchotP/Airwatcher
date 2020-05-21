@@ -2,8 +2,12 @@
 #include <string>
 #include <vector>
 #include <ctype.h>
-#include "lib/optionparser.h"
 #include <time.h>
+#include <ctime>
+#include "../lib/optionparser.h"
+
+#include "./logReader.h"
+#include "../lib/util.h"
 
 using namespace std;
 
@@ -66,7 +70,7 @@ option::ArgStatus IsLocalisation(const option::Option &option, bool msg)
     }
 
     string lat = arg.substr(0, pos);
-    string longitude = arg.substr(pos + 1, string::npos);
+    string longitude = arg.substr(pos + 1);
 
     if (lat.empty() || longitude.empty())
     {
@@ -84,6 +88,7 @@ option::ArgStatus IsLocalisation(const option::Option &option, bool msg)
             cerr << "La latitude doit être comprise entre -90° et 90°. La longitude doit être comprise entre -180° et 180° " << endl;
             return option::ARG_ILLEGAL;
         }
+        return option::ARG_OK;
     }
     catch (exception e)
     {
@@ -115,22 +120,22 @@ option::ArgStatus IsEtendueT(const option::Option &option, bool msg)
         {
             continue;
         }
-        else if (*it == 'a' && (!a && !m && !j && !h))
+        else if (*it == 'a' && !a && !(m || j || h))
         {
             a = true;
             continue;
         }
-        else if (*it == 'm' && (a && !m && !j && !h))
+        else if (*it == 'm' && !m && !(j || h))
         {
             m = true;
             continue;
         }
-        else if (*it == 'j' && (a && m && !j && !h))
+        else if (*it == 'j' && !j && !h)
         {
             j = true;
             continue;
         }
-        else if (*it == 'h' && (a && m && j && !h) && it == arg.end() - 1)
+        else if (*it == 'h' && !h && it == arg.end() - 1)
         {
             h = true;
             break;
@@ -140,7 +145,7 @@ option::ArgStatus IsEtendueT(const option::Option &option, bool msg)
             break;
         }
     }
-    if (!(a && m && j && h))
+    if (!(a || m || j || h))
     {
         cerr << "Etendue temporelle invalide. Le format demandé est : \"...a...m...j...h\"" << endl;
         return option::ARG_ILLEGAL;
@@ -179,6 +184,10 @@ option::ArgStatus IsEtendueD(const option::Option &option, bool msg)
         cerr << "L'étendue datée doit être de la forme \"JJ/MM/AAAA-JJ/MM/AAAA\"" << endl;
         return option::ARG_ILLEGAL;
     }
+
+    return option::ARG_OK;
+
+
 }
 
 const option::Descriptor usage[] =
@@ -205,6 +214,42 @@ int main(int argc, char *argv[])
     vector<option::Option> options(stats.options_max);
     vector<option::Option> buffer(stats.buffer_max);
     option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
+    
+    // Première possibilité : données brutes
+    if(options[LOCALISATION]) {
+        string localisation = options[LOCALISATION].arg;
+        cout << localisation << endl;
+        string rayon, etendueT, etendueD;
+        bool flag_r = false, flag_t = false, flag_d = false;
+        
+        if(options[RAYON]) {
+            rayon = options[RAYON].arg;
+            flag_r = true;
+        }
+        if(options[ETENDUE_T]) {
+            etendueT = options[ETENDUE_T].arg;
+            flag_t = true;
+        }
+        if(options[ETENDUE_D]) {
+            etendueD = options[ETENDUE_D].arg;
+            flag_d = true;
+            size_t pos = etendueD.find("-");
 
-    option::printUsage(cout, usage);
+            string first_date = etendueD.substr(0, pos);
+            string second_date = etendueD.substr(pos + 1, string::npos);
+            tm time_one;
+            tm time_two;
+            strptime(first_date.c_str(), "%d/%m/%Y", &time_one);
+            strptime(second_date.c_str(), "%d/%m/%Y", &time_two);
+     
+       
+
+        }
+
+            
+
+    } else {
+        option::printUsage(cout, usage);
+    }
+
 }
