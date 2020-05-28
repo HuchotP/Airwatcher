@@ -5,18 +5,14 @@
 
 using namespace std;
 
-UtilisateurPrive::UtilisateurPrive(int ID, string nom, int  pts, int idCapteur, int noteFiabilité=5) : Utilisateur(ID) {
+UtilisateurPrive::UtilisateurPrive(int ID, string nom, int  pts, int idCapteur, int noteFiabilite=5) : Utilisateur(ID) {
     #ifdef MAP
         cout << "Appel au constructeur de UtilisateurPrive." << endl;
     #endif
     this->name = nom;
     this->points = pts;
     this->idCapteur=idCapteur;
-    this->fiabilité = noteFiabilité;
-    this->mesuresFournies = Mesure[100];
-    for (int i=0; i<100; ++i) {
-        this->mesuresFournies[i]=null;
-    }
+    this->fiabilite = noteFiabilite;
 }
 
 UtilisateurPrive::UtilisateurPrive(UtilisateurPrive & unUtilisateurPrive) : Utilisateur(unUtilisateurPrive) {
@@ -34,40 +30,34 @@ UtilisateurPrive::~UtilisateurPrive() {
     #endif
 }
 
-int getIdCapteur(){
+int UtilisateurPrive::getIdCapteur(){
     #ifdef MAP
         cout << "Appel a la methode getIdCapteur() de UtilisateurPrive." << endl;
     #endif
-    return this->idCapteur;
+    return idCapteur;
 }
 
 int UtilisateurPrive::consultationPoints() {
     #ifdef MAP
         cout << "Appel a la methode consultationPoints() de UtilisateurPrive." << endl;
     #endif
-    return this->points;
+    return points;
 }
 
 void UtilisateurPrive::ajoutMesure(Mesure & m) {
     #ifdef MAP
         cout << "Appel a la methode ajoutMesure() de UtilisateurPrive." << endl;
     #endif
-    for (int i=0; i<100; ++i) {
-        if (mesuresFournies[i]==null) {
-            mesuresFournies[i]=m;
-            break;
-        }
-    }
+    mesuresFournies.push_back(m);
 }
 
 void UtilisateurPrive::historiqueMesure() {
     #ifdef MAP
         cout << "Appel a la methode historiqueMesure() de UtilisateurPrive." << endl;
     #endif
-    for (int i=0; i<100; ++i) {
-        if (mesuresFournies[i]!=null) {
-            afficher(mesuresFournies[i]);
-        }
+    for(unsigned int i = 0; i < mesuresFournies.size(); i++) // Dâ€™ailleurs, i++ ou ++i ?
+    {
+      mesuresFournies[i].AfficherMesure();
     }
 }
 
@@ -77,42 +67,3 @@ void UtilisateurPrive::recompenser(int pointsAttribues) {
     #endif
     this->points+=pointsAttribues;
 }
-
-Mesure * UtilisateurPrive::identifierFausseDonnee(){
-    #ifdef MAP
-        cout << "Appel a la methode identifierFausseMesure() de UtilisateurPrive." << endl;
-    #endif
-
-    Mesure * mesure;
-    return mesure;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

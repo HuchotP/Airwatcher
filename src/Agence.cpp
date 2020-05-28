@@ -6,12 +6,11 @@ using namespace std;
 
 Agence::Agence(int id, measurementsReader reader) : Utilisateur(id)
 {
-    #ifdef MAP 
+    #ifdef MAP
         cout << "Appel au constructeur de Agence." << endl;
     #endif
-    
-    this->dataReader = reader;
 
+    this->dataReader = reader;
 }
 
 Agence::~Agence()
@@ -26,14 +25,14 @@ void Agence::accederDonnees()
 {
     #ifdef MAP
         cout<<"Appel a la methode accederDonnees() de Agence" << endl;
-    #endif 
+    #endif
 
     vector<string> data;
 
     data = dataReader.next();
 
     cout << "Timestamp | SensorId | Lat/Long | AttributeId | Value" << endl;
-    
+
     while(!data.empty()){
 
         Mesure current = util::stringVectorToMesure(data);
@@ -60,7 +59,7 @@ float Agence::evaluerCapteur(Capteur & capt)
 {
     #ifdef MAP
         cout<<"Appel a la methode evaluerCapteur() de Agence" << endl;
-    #endif 
+    #endif
 
     return 0.0;
 
@@ -70,18 +69,10 @@ double Agence::moyenne()
 {
     #ifdef MAP
         cout<<"Appel a la methode moyenne() de Agence" << endl;
-    #endif 
+    #endif
 
     return 0.0;
 
 }
 
-float Agence::comportementSimilaire(Capteur & capt)
-{
-    #ifdef MAP
-        cout<<"Appel a la methode comportementSimilaire() de Agence" << endl;
-    #endif 
 
-    return 0.0;
-
-}

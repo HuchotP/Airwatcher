@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include <time.h> 
+#include <time.h>
 #include "Capteur.h"
 
 using namespace std;
@@ -11,7 +11,8 @@ using namespace std;
 class Mesure
 {
 public :
-    Mesure(time_t time, int sID, string aID, float val, bool status);    
+    Mesure(time_t time, int sID, string aID, float val, bool status);
+    Mesure();
     Mesure(const Mesure& mes);
     ~Mesure();
     void AfficherMesure();

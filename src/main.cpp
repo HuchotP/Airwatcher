@@ -103,6 +103,7 @@ option::ArgStatus IsEtendueT(const option::Option& option, bool msg)
 	if (!option.arg)
 	{
 		cerr << "Etendue temporelle invalide. Le format demandé est : \"...a...m...j...h\"" << endl;
+		exit(0);
 		return option::ARG_ILLEGAL;
 	}
 	string arg(option.arg);
@@ -110,6 +111,7 @@ option::ArgStatus IsEtendueT(const option::Option& option, bool msg)
 	if (pos != string::npos)
 	{
 		cerr << "L'étendue temporelle ne doit pas contenir d'espace" << endl;
+		exit(0);
 		return option::ARG_ILLEGAL;
 	}
 	bool a, m, j, h;
@@ -149,6 +151,7 @@ option::ArgStatus IsEtendueT(const option::Option& option, bool msg)
 	if (!(a || m || j || h))
 	{
 		cerr << "Etendue temporelle invalide. Le format demandé est : \"...a...m...j...h\"" << endl;
+		exit(0);
 		return option::ARG_ILLEGAL;
 	}
 	else
@@ -191,6 +194,19 @@ option::ArgStatus IsEtendueD(const option::Option& option, bool msg)
 
 }
 
+option::ArgStatus IsRayon(const option::Option& option, bool msg) {
+	string arg(option.arg);
+	char* end = nullptr;
+	double val = strtod(arg.c_str(), &end);
+	 if (end != arg.c_str() && *end == '\0' && val != HUGE_VAL) {
+		 return option::ARG_OK;
+	 }
+	 else {
+		 exit(0);
+		 return option::ARG_ILLEGAL;
+	 }
+}
+
 const option::Descriptor usage[] =
 {
 	{UNKNOWN, OTHER, "", "", option::Arg::None, "USAGE: Airwatcher [mode] [options]\n\n"
@@ -198,7 +214,7 @@ const option::Descriptor usage[] =
 	{LOCALISATION, PARAMETRE, "l", "localisation", IsLocalisation, "  --localisation, -l \tChoix de la localisation pour l'analyse"},
 	{ETENDUE_T, PARAMETRE, "t", "etendue_t", IsEtendueT, "  --etendue_t, -t \tChoix de l'étendue temporelle"},
 	{ETENDUE_D, PARAMETRE, "d", "date", IsEtendueD, "  --date, -d \tChoix de l'étendue datée. Format : JJ/MM/AAAA-JJ/MM/AAAA"},
-	{RAYON, PARAMETRE, "r", "rayon", option::Arg::None, "  --rayon, -r \tPermet de préciser le rayon dans lequel les données doivent êtres examinées. Doit être suivie de l'option -l."},
+	{RAYON, PARAMETRE, "r", "rayon", IsRayon, "  --rayon, -r \tPermet de préciser le rayon dans lequel les données doivent êtres examinées. Doit être suivie de l'option -l."},
 	{HELP, OTHER, "h", "help", option::Arg::None, "  --help, -h  \tAfficher l'aide."},
 	{QUALITE, MODE, "q", "qualite", option::Arg::None, "  --qualite, -q  \tAffiche un indice de la qualité de l'air. Doit être suivie de l'option -l."},
 	{SIMILAIRE, MODE, "s", "similaire", option::Arg::None, "  --similaire, -s \tMode de recherche des comportements similaires. Doit être suivie de l'option -l."},
@@ -215,6 +231,7 @@ int main(int argc, char* argv[])
 	vector<option::Option> options(stats.options_max);
 	vector<option::Option> buffer(stats.buffer_max);
 	option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
+
 	double rayonEffectif = -1;
 	string rayon, etendueT, etendueD;
 	bool flag_l = false, flag_t = false, flag_d = false;
@@ -228,30 +245,83 @@ int main(int argc, char* argv[])
 		size_t pos = localisation.find(",");
 		string lat = localisation.substr(0, pos);
 		string longitude = localisation.substr(pos + 1);
+
 		char* end;
 		double latitudeDouble = strtod(lat.c_str(), &end);
 		localisationVector.push_back(latitudeDouble);
 		char* end2;
 		double longitudeDouble = strtod(longitude.c_str(), &end);
 		localisationVector.push_back(longitudeDouble);
+
 		rayonEffectif = 60;
 		if (options[RAYON]) {
 			rayon = options[RAYON].arg;
-			double rayonEffectif = stoi(rayon);
+			char* end3;
+			double rayonEffectif = strtod(rayon.c_str(),&end3);
+			cout << rayonEffectif << endl;
 			flag_l = true;
 		}
 
 	}
 	if (options[ETENDUE_T]) {
-
+		cout << "etendue temporelle " << endl;
 		etendueT = options[ETENDUE_T].arg;
-	
 		flag_t = true;
+		int lastDigit;
+		t_value.push_back(0);
+		t_value.push_back(0);
+		t_value.push_back(0);
+		t_value.push_back(0);
+		bool a, m, j, h;
+		a = m = j = h = false;
+		int lastNumber = 0;
+		for (string::iterator it = etendueT.begin(); it != etendueT.end(); ++it)
+		{
+			lastDigit = *it;
+			
+			if (isdigit(lastDigit))
+			{
+				lastNumber = lastDigit-48;
+				continue;
+			}
+			else if (*it == 'a' && !a && !(m || j || h))
+			{
+				t_value[0]= lastNumber;
+				cout << "annee : " << t_value[0] << endl;
+				a = true;
+				continue;
+			}
+			else if (*it == 'm' && !m && !(j || h))
+			{
+				t_value[1] = lastNumber;
+				cout << "mois : " << t_value[1] << endl;
+				m = true;
+				continue;
+			}
+			else if (*it == 'j' && !j && !h)
+			{
+				t_value[2] = lastNumber;
+				cout << "jour : " << t_value[2] << endl;
+				j = true;
+				continue;
+			}
+			else if (*it == 'h' && !h && it == etendueT.end() - 1)
+			{
+				t_value[3] = lastNumber;
+				cout << "heure : " << t_value[3] << endl;
+				h = true;
+				break;
+			}
+			else
+			{
+				break;
+			}
+		}
+
 		//init measurementsReader avec recherche tempo
 	}else if (options[ETENDUE_D]) {
 
 		etendueD = options[ETENDUE_D].arg;
-	
 		flag_d = true;
 		size_t pos = etendueD.find("-");
 		string first_date = etendueD.substr(0, pos);
@@ -260,6 +330,9 @@ int main(int argc, char* argv[])
 		tm time_two;
 		strptime(first_date.c_str(), "%d/%m/%Y", &time_one);
 		strptime(second_date.c_str(), "%d/%m/%Y", &time_two);
+		d_value.push_back(time_one);
+		d_value.push_back(time_two);
+
 		//init measurementsReader avec recherche date
 	}
 

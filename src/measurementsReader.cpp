@@ -66,6 +66,7 @@ Mesure* measurementsReader::next() {
 	while (!result.empty()) {
 		int sensorId = stoi(result[1].substr(6));
 		if (rayon_value != (-1)) {
+
 			if (find_if(acceptedSensors.begin(), acceptedSensors.end(),[&sensorId](const Capteur& obj) {return obj.getSensorId() == sensorId;}) == acceptedSensors.end()) {
 				result = logReader::next();
 				continue;
@@ -92,8 +93,6 @@ Mesure* measurementsReader::next() {
 			time_sensor.tm_sec = 0;
 			time_sensor.tm_min = 0;
 
-		//	cout << "strptime : année : "<< time_sensor.tm_year << " mois : " <<  time_sensor.tm_mon << " jour : " << time_sensor.tm_mday <<  endl;
-	
 			time_t now_t = time(0);
 			tm * now = localtime(&now_t);
 	//		cout << "strptime now : année : " << now->tm_year << " mois : " << now->tm_mon << " jour : " << now->tm_mday << endl;
@@ -105,12 +104,13 @@ Mesure* measurementsReader::next() {
 			min_time.tm_hour = now->tm_hour - temporal_values[3];
 			min_time.tm_sec = 0;
 			min_time.tm_min = 0;
-		//	cout << "strptime min_time : année : " << min_time.tm_year << " mois : " << min_time.tm_mon << " jour : " << min_time.tm_mday << endl;
-
-		//	cout << "mktime sensor :" << mktime(&time_sensor) << " mktime min : " << mktime(&min_time) << endl;
-
-		//	cout << "difftime: " <<difftime(mktime(&time_sensor), mktime(&min_time)) << endl;
 			if (difftime(mktime(&time_sensor), mktime(&min_time)) >= 0){
+/*
+				cout << "strptime : année : " << time_sensor.tm_year << " mois : " << time_sensor.tm_mon << " jour : " << time_sensor.tm_mday << endl;
+				cout << "strptime min_time : année : " << min_time.tm_year << " mois : " << min_time.tm_mon << " jour : " << min_time.tm_mday << endl;
+				cout << "mktime sensor :" << mktime(&time_sensor) << " mktime min : " << mktime(&min_time) << endl;
+				cout << "difftime: " << difftime(mktime(&time_sensor), mktime(&min_time)) << endl;
+*/			
 				Mesure* resultat = new Mesure(util::stringVectorToMesure(result));
 				return resultat;
 			}

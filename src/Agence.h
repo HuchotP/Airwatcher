@@ -8,9 +8,9 @@
 #include "Mesure.h"
 #include "measurementsReader.h"
 
- using namespace std;
+using namespace std;
 
- class Agence : public Utilisateur {
+class Agence : public Utilisateur {
      public :
         Agence(int id, measurementsReader reader);
         Agence(Agence & uneAgence);

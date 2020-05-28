@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "Mesure.h"
 #include "Utilisateur.h"
 
@@ -10,7 +11,7 @@ using namespace std;
 
 class UtilisateurPrive : public Utilisateur {
     public :
-        UtilisateurPrive(int ID, string nom, int pts, int idCapteur, int noteFiabilité=5);
+        UtilisateurPrive(int ID, string nom, int pts, int idCapteur, int noteFiabilite);
         UtilisateurPrive(UtilisateurPrive & unUtilisateurPrive);
         ~UtilisateurPrive();
         int consultationPoints();
@@ -18,13 +19,12 @@ class UtilisateurPrive : public Utilisateur {
         void ajoutMesure(Mesure & m);
         void historiqueMesure();
         void recompenser(int pointsAttribues);
-        void identifierFausseDonnee();
 
     private :
         string name;
         int points;
         int idCapteur;
-        int fiabilité;
-        Mesure * mesuresFournies;
+        int fiabilite;
+        vector<Mesure> mesuresFournies;
 };
  #endif
