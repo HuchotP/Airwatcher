@@ -32,12 +32,13 @@ measurementsReader::measurementsReader(string nomFichier, char subdelim, vector<
 	if (rayon_value != (-1)) {
 		logReader reader("./data/sensors.csv", ';');
 		vector<string> current;
+
 		current = reader.next();
+
 		while (!current.empty()) {
 			string lat_c = current[1];
 			string long_c = current[2];
-
-			if (util::estDansRayon(localisation[0], localisation[1], rayon_value, stod(lat_c), stod(long_c))) {
+			if (util::estDansRayon(localisation_value[0], localisation_value[1], rayon_value, stod(lat_c), stod(long_c))) {
 				Capteur c(stoi(current[0].substr(6)), current[1], current[2],true);
 				acceptedSensors.push_back(c);
 			}
@@ -60,7 +61,7 @@ measurementsReader::~measurementsReader()
 #endif
 } //----- Fin de ~measurementsMap
 
-M measurementsReader::next() {
+Mesure* measurementsReader::next() {
 	vector<string> result = logReader::next();
 	while (!result.empty()) {
 		int sensorId = stoi(result[1].substr(6));
@@ -73,12 +74,15 @@ M measurementsReader::next() {
 
 		if (flag_date) { //if we want to filter measurements between two dates
 			tm time;
-			strptime(result[0].c_str(), "%Y-%m-%d", &time);
 
+			strptime(result[0].c_str(), "%Y-%m-%d %H", &time);
+			time.tm_sec = 0;
+			time.tm_min = 0;
 			if (time.tm_year >= date_value[0].tm_year && time.tm_year <= date_value[1].tm_year &&
 				time.tm_mon >= date_value[0].tm_mon && time.tm_mon <= date_value[1].tm_mon &&
 				time.tm_mday >= date_value[0].tm_mday && time.tm_mday <= date_value[1].tm_mday) {
-				return result;
+				Mesure* resultat = new Mesure(util::stringVectorToMesure(result));
+				return resultat;
 			}
 
 		}
@@ -106,20 +110,23 @@ M measurementsReader::next() {
 		//	cout << "mktime sensor :" << mktime(&time_sensor) << " mktime min : " << mktime(&min_time) << endl;
 
 		//	cout << "difftime: " <<difftime(mktime(&time_sensor), mktime(&min_time)) << endl;
-
 			if (difftime(mktime(&time_sensor), mktime(&min_time)) >= 0){
-				return result;
+				Mesure* resultat = new Mesure(util::stringVectorToMesure(result));
+				return resultat;
 			}
 			
 		}
 		else{
-			
-			return result;
+			tm time;
+
+			strptime(result[0].c_str(), "%Y-%m-%d %H", &time);
+			time.tm_sec = 0;
+			time.tm_min = 0;
+			Mesure* resultat = new Mesure(util::stringVectorToMesure(result));
+			return resultat;
 		}
 		result = logReader::next();
 	}
 
-	return result;
-
-
+	return NULL;
 }

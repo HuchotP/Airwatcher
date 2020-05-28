@@ -22,7 +22,12 @@ class Cleaner
     int cleanerID;
     float latitude ;
     float longitude ;
-    time_t start ;
+    
+    
+    
+    
+    
+    start ;
     time_t stop ;
 };
 

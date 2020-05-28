@@ -32,8 +32,8 @@ public:
     //----------------------------------------------------- Méthodes publiques
     ~measurementsReader ();
 
-    vector<string> next();
-    static vector<Capteur> acceptedSensors;
+    Mesure* next();
+     vector<Capteur> acceptedSensors;
 
 protected:
 

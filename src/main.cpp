@@ -208,41 +208,50 @@ const option::Descriptor usage[] =
 
 int main(int argc, char* argv[])
 {
-
+	measurementsReader* mesReader;
 	argc -= (argc > 0);
 	argv += (argc > 0); // skip program name argv[0] if present
 	option::Stats stats(usage, argc, argv);
 	vector<option::Option> options(stats.options_max);
 	vector<option::Option> buffer(stats.buffer_max);
 	option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
-	double rayonEffectif;
+	double rayonEffectif = -1;
 	string rayon, etendueT, etendueD;
-	bool flag_r = false, flag_t = false, flag_d = false;
-	vector<double> localisation;
+	bool flag_l = false, flag_t = false, flag_d = false;
+	vector<double> localisationVector;
 	vector<int> t_value;
 	vector<tm> d_value;
 
 	// Première possibilité : données brutes
 	if (options[LOCALISATION]) {
 		string localisation = options[LOCALISATION].arg;
-		cout << localisation << endl;
-
+		size_t pos = localisation.find(",");
+		string lat = localisation.substr(0, pos);
+		string longitude = localisation.substr(pos + 1);
+		char* end;
+		double latitudeDouble = strtod(lat.c_str(), &end);
+		localisationVector.push_back(latitudeDouble);
+		char* end2;
+		double longitudeDouble = strtod(longitude.c_str(), &end);
+		localisationVector.push_back(longitudeDouble);
+		rayonEffectif = 60;
 		if (options[RAYON]) {
-			cout << "afficher r" << endl;
 			rayon = options[RAYON].arg;
 			double rayonEffectif = stoi(rayon);
-			flag_r = true;
+			flag_l = true;
 		}
 
 	}
 	if (options[ETENDUE_T]) {
+
 		etendueT = options[ETENDUE_T].arg;
+	
 		flag_t = true;
 		//init measurementsReader avec recherche tempo
-
-		
 	}else if (options[ETENDUE_D]) {
+
 		etendueD = options[ETENDUE_D].arg;
+	
 		flag_d = true;
 		size_t pos = etendueD.find("-");
 		string first_date = etendueD.substr(0, pos);
@@ -253,89 +262,10 @@ int main(int argc, char* argv[])
 		strptime(second_date.c_str(), "%d/%m/%Y", &time_two);
 		//init measurementsReader avec recherche date
 	}
-	measurementsReader mesReader;
-	if (!(flag_d)&&(!flag_r)&&(!flag_t)){
-		//init sans rien
-		mesReader(string("./data/measurements.csv"),';',localisation,rayonEffectif,t_value,flag_d,flat_t,d_value);
-		(string nomFichier, char subdelim, vector<double> localisation, double r_value, vector<int> & t_value, bool flag_d, bool flag_t, vector<tm> d_value)
-	}
-	if (flag_t) {
-		mesReader(string("./data/measurements.csv"), ';', localisation, rayonEffectif, t_value, flag_d, flat_t, d_value);
-	}
-	else if (flag_d) {
-		
-		mesReader(string("./data/measurements.csv"), ';', localisation, rayonEffectif, t_value, flag_d, flat_t, d_value);
-	}
 
-
-	/*
-	logReader log("./data/sensors.csv", ';');
-	vector<string> result;
-	do {
-		result = log.next();
-		for (int i = 0; i < result.size(); i++) {
-			cout << result[i] << " ";
+		mesReader = new measurementsReader(string("./data/measurements.csv"), ';', localisationVector, rayonEffectif, t_value, flag_d, flag_t, d_value);
+		Mesure* mes;
+		while ((mes=mesReader->next())!=nullptr) {
+			mes->AfficherMesure();
 		}
-		
-		cout << endl;
-	} while (!result.empty());
-	*/
-	vector<double> localisation;
-	vector<int> t_value;
-	vector<tm> d_value;
-
-	string date_string("04/05/2019-25/05/2019");
-
-	size_t pos = date_string.find("-");
-	string first_date = date_string.substr(0, pos);
-	string second_date = date_string.substr(pos + 1, string::npos);
-	tm time_one;
-	tm time_two;
-	strptime(first_date.c_str(), "%d/%m/%Y", &time_one);
-	strptime(second_date.c_str(), "%d/%m/%Y", &time_two);
-
-
-	d_value.push_back(time_one);
-	d_value.push_back(time_two);
-	
-	int annee = 1;
-	int mois = 0;
-	int jour = 10;
-	int heure = 0;
-	vector<int> tempoEtendue;
-		tempoEtendue.push_back(annee);
-		tempoEtendue.push_back(mois);
-		tempoEtendue.push_back(jour);
-		tempoEtendue.push_back(heure);
-
-		measurementsReader mesReader2(string("./data/measurements.csv"), ';', localisation, -1, tempoEtendue, true, false, d_value);
-
-		/*vector<string> result2;
-		do {
-			result2 = mesReader2.next();
-			for (int i = 0; i < result2.size(); i++) {
-				cout << result2[i] << " ";
-			}
-
-			cout << endl;
-		} while (!result2.empty());*/
-
-		double x = 45.6;
-		double y = 2.5;
-		vector<double> localisation2;
-		localisation2.push_back(x);
-		localisation2.push_back(y);
-
-		measurementsReader mesReader3(string("./data/measurements.csv"), ';', localisation2, 70, tempoEtendue, false, false, d_value);
-
-		vector<string> result3;
-		do {
-			result3 = mesReader3.next();
-			for (int i = 0; i < result3.size(); i++) {
-				cout << result3[i] << " ";
-			}
-
-			cout << endl;
-		} while (!result3.empty());
-
 }

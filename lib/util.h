@@ -10,6 +10,8 @@ using namespace std;
 #include <cmath>
 #include <fstream>
 #include <ctime>
+#include "../src/Mesure.h"
+
 
 //--------------------------------------------------- Interfaces utilisées
 
@@ -32,7 +34,12 @@ public:
     }
 
     static Mesure stringVectorToMesure(vector<string> vector_mesures) {
-        Mesure m(strptime(vector_mesures[0], "%Y-%m-%d %H"), substr(vector_mesures[1], 6), vector_mesures[2], stof(vector_mesures[3]), true);
+        tm temps;
+        strptime(vector_mesures[0].c_str(), "%Y-%m-%d %H", &temps);
+        temps.tm_hour = 0;
+        temps.tm_min = 0;
+        temps.tm_sec = 0;
+        Mesure m(mktime(&temps), stoi(vector_mesures[1].substr(6)), vector_mesures[2], stof(vector_mesures[3]), true);
         return m;
     } 
 
