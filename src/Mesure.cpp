@@ -1,14 +1,20 @@
+#include <time.h> 
 #include <iostream>
 #include "Mesure.h"
-#include <time.h> 
+#include "measurementsReader.h"
 using namespace std;
 
-Mesure::Mesure(time_t time, string sID, string aID, float val, bool status)
+Mesure::Mesure(time_t time, int sID, string aID, float val, bool status=null)
     : timeStamp(time), sensorID(sID), attributeID(aID), value(val), status(status)
 { 
     #ifdef MAP
     cout << "Appel au constructeur de <Mesure>" << endl;
     #endif
+    iterator it = find_if(measurementsReader::acceptedSensors.begin(), measurementsReader::acceptedSensors.end(),[&sensorId](const Capteur& obj) {return obj.getSensorId() == sensorId;});
+    if(it != measurementsReader::acceptedSensors.end()) {
+        sensor = measurementsReader::acceptedSensors[it];
+    }
+
 }
 
 Mesure::~Mesure()

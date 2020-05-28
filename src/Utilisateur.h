@@ -1,3 +1,6 @@
+#if ! defined ( UTILISATEUR_H )
+#define UTILISATEUR_H
+
 #include <iostream>
 #include <string>
 
@@ -13,3 +16,4 @@ class Utilisateur {
     private :
         int userid;
 };
+ #endif

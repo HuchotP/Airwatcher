@@ -5,20 +5,24 @@
 #include <string>
 #include <time.h> 
 
+#include "Capteur.h"
+
 using namespace std;
 
 class Mesure
 {
-    public :
-    Mesure(time_t time, string sID, string aID, float val, bool status);    
+public :
+    Mesure(time_t time, int sID, string aID, float val, bool status=NULL);    
     ~Mesure();
     void AfficherMesure();
 
     time_t timeStamp ;
-    string sensorID ;
+    int sensorID ;
+    Capteur sensor;
     string attributeID ;
     float value ;
     bool status ;
+
 };
 
 #endif

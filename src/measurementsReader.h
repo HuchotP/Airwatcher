@@ -9,6 +9,8 @@ using namespace std;
 #include <fstream>
 #include <time.h>
 #include "logReader.h"
+#include "./Capteur.h"
+#include "Mesure.h"
 
 //--------------------------------------------------- Interfaces utilisées
 
@@ -21,19 +23,19 @@ using namespace std;
 
 class measurementsReader : public logReader
 {
+
 public:
     //Constructeurs de measurementsMap
 
-   measurementsReader (string nomFichier, char subdelim, vector<double> localisation, double r_value, vector<int> & t_value, bool flag_d, vector<tm> d_value);
+   measurementsReader (string nomFichier, char subdelim, vector<double> localisation, double r_value, vector<int> & t_value, bool flag_d, bool flag_t, vector<tm> d_value);
 
     //----------------------------------------------------- Méthodes publiques
     ~measurementsReader ();
 
     vector<string> next();
+    static vector<Capteur> acceptedSensors;
 
 protected:
-
-    vector<Capteur> acceptedSensors;
 
     vector<double> localisation_value;
     bool flag_rayon;
@@ -44,9 +46,6 @@ protected:
     bool flag_date;
     vector<tm> date_value;
 
-    const unsigned int secondsInHour = 3600;
-    const unsigned int hoursInDay = 24;
-    const unsigned int dayInMonth = 
 };
 
 

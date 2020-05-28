@@ -1,10 +1,11 @@
 //---------------------------------------------------------------- INCLUDE
 
 //-------------------------------------------------------- Include système
+using namespace std;
 #include <iostream>
 #include <sstream>
 
-using namespace std;
+
 
 //------------------------------------------------------ Include personnel
 #include "logReader.h"

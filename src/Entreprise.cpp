@@ -1,22 +1,19 @@
 #include <iostream>
 #include <string>
 #include "Entreprise.h"
+#include "Cleaner.h"
 
 using namespace std;
 
-Entreprise::Entreprise(int ID, string nom) {
+Entreprise::Entreprise(int ID, string nom) : Utilisateur(ID) {
     #ifdef MAP 
         cout << "Appel au constructeur de Entreprise." << endl;
     #endif
     this->userID = ID;
     this->name = nom;
-    this->tabCleaner = Cleaner[100];
-    for (int i=0; i<100; ++i) {
-        tabCleaner[i]=null;
-    }
 }
 
-Entreprise::Entreprise(Entreprise & uneEmtreprise) {
+Entreprise::Entreprise(Entreprise & uneEntreprise) : Utilisateur(uneEntreprise) {
     #ifdef MAP 
         cout << "Appel au constructeur par copie de Entreprise." << endl;
     #endif
@@ -31,37 +28,32 @@ Entreprise::~Entreprise() {
     #endif
 }
 
-Entreprise::ajoutAirCleaner(Cleaner & c) {
+void Entreprise::ajoutAirCleaner(Cleaner & c) {
     #ifdef MAP 
         cout << "Appel a la methode ajoutAirCleaner() de Entreprise." << endl;
     #endif
-    for (int i=0; i<100; ++i) {
-        
- (tabCleaner[i]==null) {
-            tabCleaner[i]=c;
-            break;
-        }    }
+    tabCleaner.push_back(c);
 }
 
-Entreprise::mesuresProchesAirClfeaner(Cleaner & c) {
+float Entreprise::mesuresProchesAirCleaner(Cleaner & c) {
     #ifdef MAP 
         cout << "Appel a la methode mesuresProchesAirCleaner() de Entreprise." << endl;
     #endif
 }
  
-Entreprise::moyenneAirCleaner(Cleaner & c) {
+float Entreprise::moyenneAirCleaner(Cleaner & c) {
     #ifdef MAP 
         cout << "Appel a la methode moyenneAirCleaner() de Entreprise." << endl;
     #endif
 }
 
-Entreprise::etendueZoneTraitee(Cleaner & c) {
+float Entreprise::etendueZoneTraitee(Cleaner & c) {
     #ifdef MAP 
         cout << "Appel a la methode etendueZoneTraitee de Entreprise." << endl;
     #endif
 }
 
-Entreprise::niveauAmelioration(Cleaner & c) {
+float Entreprise::niveauAmelioration(Cleaner & c) {
     #ifdef MAP 
         cout << "Appel a la methode niveauAmelioration() de Entreprise." << endl;
     #endif

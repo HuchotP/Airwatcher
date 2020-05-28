@@ -6,18 +6,20 @@
 #include "Capteur.h"
 #include "Utilisateur.h"
 #include "Mesure.h"
+#include "measurementsReader.h"
 
  using namespace std;
 
  class Agence : public Utilisateur {
      public :
-        Agence();
+        Agence(int id, measurementsReader reader);
         Agence(Agence & uneAgence);
-        ~Agence();
-        Mesure * accederDonnees();
+        void accederDonnees();
         float evaluerCapteur (Capteur & capt);
-        float moyenne();
-        float comportementSimilaire(Capteur & capt);
+        double moyenne();
+        void comportementSimilaire(Capteur & capt);
+
+        measurementsReader dataReader;
  };
 
  #endif

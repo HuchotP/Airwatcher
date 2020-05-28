@@ -1,12 +1,17 @@
+#if ! defined ( ENTREPRISE_H )
+#define ENTREPRISE_H
+
 #include <iostream>
 #include <string>
-#include "lib/Cleaner.h"
+#include <vector>
+#include "Cleaner.h"
+#include "Utilisateur.h"
 
  using namespace std;
 
- class Entreprise : Utilisateur {
+ class Entreprise : public Utilisateur {
      public :
-        Entreprise(string nom);
+        Entreprise(int ID, string nom);
         Entreprise(Entreprise & uneEntreprise);
         ~Entreprise();
         void ajoutAirCleaner(Cleaner & c);
@@ -17,5 +22,7 @@
 
      private :
         string name;
-        Cleaner * tabCleaner;
+        vector<Cleaner> tabCleaner;
+        int userID;
  };
+  #endif
