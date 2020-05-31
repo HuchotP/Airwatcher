@@ -5,25 +5,25 @@
 #include "Mesure.h"
 #include "measurementsReader.h"
 #include "UtilisateurPrive.h"
-#include <math.h> 
-
+#include <math.h>
+#include <algorithm>
+#include <string>
 
 using namespace std;
 
 class Algorithm
 {
  public:
-    Algorithm(vector<UtilisateurPrive> &utilisateurs) {}
     static void capteursSimilaires(Capteur & capt);
-    static float moyenne(measurementsReader reader);
-    static void identifierFausseDonnee(measurementsReader reader, Mesure& mesureAExaminer);
+    static vector<float> moyenne(measurementsReader* mesReader, vector<UtilisateurPrive*> &utilisateurs); //renvoie -1 si aucune mesure n'a pu etre prise en compte, la valeur moyenne sinon
+    static void identifierFausseDonnee(measurementsReader* mesReader, Mesure& mesureAExaminer,  vector<UtilisateurPrive*> &utilisateurs);
     static void impactAirCleaner();
-    static void recompenserUtilisateur(int userID, int recompense);
-    vector<UtilisateurPrive> utilisateurs;
-    
+    static void recompenserUtilisateur(vector<UtilisateurPrive*> &utilisateurs, int userID, int recompense);
 
- private:
-  
+
+private:
+    Algorithm();
+    ~Algorithm();
 };
 
  #endif

@@ -5,11 +5,10 @@
 
 using namespace std;
 
-UtilisateurPrive::UtilisateurPrive(int ID, string nom, int  pts, int idCapteur, int noteFiabilite=5) : Utilisateur(ID) {
+UtilisateurPrive::UtilisateurPrive(int ID, int idCapteur, int  pts, int noteFiabilite) : Utilisateur(ID) {
     #ifdef MAP
         cout << "Appel au constructeur de UtilisateurPrive." << endl;
     #endif
-    this->name = nom;
     this->points = pts;
     this->idCapteur=idCapteur;
     this->fiabilite = noteFiabilite;
@@ -19,7 +18,6 @@ UtilisateurPrive::UtilisateurPrive(UtilisateurPrive & unUtilisateurPrive) : Util
     #ifdef MAP
         cout << "Appel au constructeur par copie de UtilisateurPrive." << endl;
     #endif
-    this->name = unUtilisateurPrive.name;
     this->points = unUtilisateurPrive.points;
     this->mesuresFournies = unUtilisateurPrive.mesuresFournies;
 }
@@ -30,18 +28,39 @@ UtilisateurPrive::~UtilisateurPrive() {
     #endif
 }
 
-int UtilisateurPrive::getIdCapteur(){
+int UtilisateurPrive::getIdCapteur() const{
     #ifdef MAP
         cout << "Appel a la methode getIdCapteur() de UtilisateurPrive." << endl;
     #endif
     return idCapteur;
 }
 
-int UtilisateurPrive::consultationPoints() {
+int UtilisateurPrive::getPoints() const{
     #ifdef MAP
-        cout << "Appel a la methode consultationPoints() de UtilisateurPrive." << endl;
+        cout << "Appel a la methode getPoints() de UtilisateurPrive." << endl;
     #endif
     return points;
+}
+
+void UtilisateurPrive::setPoints(int nouveauxPoints) {
+    #ifdef MAP
+        cout << "Appel a la methode setPoints() de UtilisateurPrive." << endl;
+    #endif
+    points = nouveauxPoints;
+}
+
+int UtilisateurPrive::getFiabilite() const{
+    #ifdef MAP
+        cout << "Appel a la methode getFiabilite() de UtilisateurPrive." << endl;
+    #endif
+    return fiabilite;
+}
+
+void UtilisateurPrive::setFiabilite(int nouvelleFiabilite) {
+    #ifdef MAP
+        cout << "Appel a la methode setFiabilite() de UtilisateurPrive." << endl;
+    #endif
+    fiabilite = nouvelleFiabilite;
 }
 
 void UtilisateurPrive::ajoutMesure(Mesure & m) {

@@ -9,6 +9,7 @@ using namespace std;
 #include "logReader.h"
 #include "./measurementsReader.h"
 #include "../lib/util.h"
+#include "usersReader.h"
 
 
 
@@ -278,7 +279,7 @@ int main(int argc, char* argv[])
 		for (string::iterator it = etendueT.begin(); it != etendueT.end(); ++it)
 		{
 			lastDigit = *it;
-			
+
 			if (isdigit(lastDigit))
 			{
 				lastNumber = lastDigit-48;
@@ -341,4 +342,7 @@ int main(int argc, char* argv[])
 		while ((mes=mesReader->next())!=nullptr) {
 			mes->AfficherMesure();
 		}
+
+		//usersReader uReader = new usersReader(string("./data/users.csv"), ';');
+
 }

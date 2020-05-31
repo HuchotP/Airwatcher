@@ -11,17 +11,19 @@ using namespace std;
 
 class UtilisateurPrive : public Utilisateur {
     public :
-        UtilisateurPrive(int ID, string nom, int pts, int idCapteur, int noteFiabilite);
+        UtilisateurPrive(int ID, int idCapteur, int pts=0, int noteFiabilite=5);
         UtilisateurPrive(UtilisateurPrive & unUtilisateurPrive);
         ~UtilisateurPrive();
-        int consultationPoints();
-        int getIdCapteur();
+        int getPoints() const;
+        void setPoints(int nouveauxPoints);
+        int getIdCapteur() const;
+        int getFiabilite() const;
+        void setFiabilite(int nouvelleFiabilite);
         void ajoutMesure(Mesure & m);
         void historiqueMesure();
         void recompenser(int pointsAttribues);
 
     private :
-        string name;
         int points;
         int idCapteur;
         int fiabilite;
