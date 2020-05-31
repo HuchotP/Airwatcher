@@ -5,6 +5,7 @@ using namespace std;
 #include <ctype.h>
 #include <time.h>
 #include <ctime>
+#include <limits>
 #include "../lib/optionparser.h"
 #include "logReader.h"
 #include "./measurementsReader.h"
@@ -253,7 +254,7 @@ int main(int argc, char* argv[])
 		double longitudeDouble = strtod(longitude.c_str(), &end);
 		localisationVector.push_back(longitudeDouble);
 
-		rayonEffectif = 60;
+		rayonEffectif = 190;
 		if (options[RAYON]) {
 			rayon = options[RAYON].arg;
 			char* end3;
@@ -336,9 +337,113 @@ int main(int argc, char* argv[])
 		//init measurementsReader avec recherche date
 	}
 
-		mesReader = new measurementsReader(string("./data/measurements.csv"), ';', localisationVector, rayonEffectif, t_value, flag_d, flag_t, d_value);
-		Mesure* mes;
-		while ((mes=mesReader->next())!=nullptr) {
-			mes->AfficherMesure();
+	mesReader = new measurementsReader(string("./data/measurements.csv"), ';', localisationVector, rayonEffectif, t_value, flag_d, flag_t, d_value);
+	Mesure* mes;
+
+	// si l'utilisateur cherche à obtenir des informations sur l'impact d'un AirCleaner
+	if(options[IMPACT]) {
+		cout << "impact" << endl;
+		rayonEffectif = numeric_limits<double>::max(); // on met le rayon d'analyse au maximum pour obtenir toutes les données
+		logReader logReaderCleaner("./data/cleaners.csv", ';');
+		vector<string> currentLine;
+		currentLine = logReaderCleaner.next();
+		while(currentLine[0] != options[IMPACT].arg) {
+			currentLine = logReaderCleaner.next();
+			if(currentLine.empty()) {
+				cerr << "Cleaner introuvable" << endl;
+				return -1;
+			}
 		}
+		double cleanerLatitude = stod(currentLine[1]);
+		double cleanerLongitude = stod(currentLine[2]);
+		double maxImpact = 0;
+		tm debutCleaner;
+		tm finCleaner;
+		strptime(currentLine[4].c_str(),"%d/%m/%Y %H:%M", &debutCleaner);
+		strptime(currentLine[5].c_str(),"%d/%m/%Y %H:%M", &finCleaner);
+
+		while ((mes=mesReader->next())!=nullptr) {
+			tm * timeMesure = localtime(&(mes->timeStamp));
+			
+			if(timeMesure->tm_yday > finCleaner.tm_yday) continue;
+
+
+			int count_SO2, count_NO3, count_O3, count_PM;
+			double sum_SO2, sum_NO3, sum_O3, sum_PM;
+			double moyenne_SO2_avant, moyenne_NO3_avant, moyenne_O3_avant, moyenne_PM_avant;
+			while(timeMesure->tm_yday < debutCleaner.tm_yday) {
+				if(mes->attributeID == "SO2") {
+					sum_SO2 += mes->value;
+					count_SO2++;
+				}
+				if(mes->attributeID == "NO3") {
+					sum_NO3 += mes->value;
+					count_NO3++;
+				}
+				if(mes->attributeID == "O3") {
+					sum_O3 += mes->value;
+					count_O3++;
+				}
+				if(mes->attributeID == "PM") {
+					sum_PM += mes->value;
+					count_PM++;
+				}
+				if((mes=mesReader->next())==nullptr) break;
+				tm * timeMesure = localtime(&(mes->timeStamp));
+			}
+			moyenne_SO2_avant = sum_SO2/count_SO2;
+			moyenne_NO3_avant = sum_NO3/count_NO3;
+			moyenne_O3_avant = sum_O3/count_O3;
+			moyenne_PM_avant = sum_PM/count_PM;
+
+			sum_SO2 = sum_NO3 = sum_O3 = sum_PM = 0;
+			count_SO2 = count_NO3 = count_O3 = count_PM = 0;
+			double moyenne_SO2_pendant, moyenne_NO3_pendant, moyenne_O3_pendant, moyenne_PM_pendant;
+
+			while(timeMesure->tm_yday < finCleaner.tm_yday) {
+				if(mes->attributeID == "SO2") {
+					sum_SO2 += mes->value;
+					count_SO2++;
+				}
+				if(mes->attributeID == "NO3") {
+					sum_NO3 += mes->value;
+					count_NO3++;
+				}
+				if(mes->attributeID == "O3") {
+					sum_O3 += mes->value;
+					count_O3++;
+				}
+				if(mes->attributeID == "PM") {
+					sum_PM += mes->value;
+					count_PM++;
+				}
+				if((mes=mesReader->next())==nullptr) break;
+				tm * timeMesure = localtime(&(mes->timeStamp));
+			}
+
+			moyenne_SO2_pendant = sum_SO2/count_SO2;
+			moyenne_NO3_pendant = sum_NO3/count_NO3;
+			moyenne_O3_pendant = sum_O3/count_O3;
+			moyenne_PM_pendant = sum_PM/count_PM;
+
+			if(moyenne_NO3_pendant/moyenne_NO3_avant < 0.15 || moyenne_SO2_pendant/moyenne_SO2_avant < 0.15 || 
+			moyenne_O3_pendant/moyenne_O3_avant < 0.15 || moyenne_PM_pendant/moyenne_PM_avant < 0.15) {
+				
+				if(maxImpact < util::distance(cleanerLatitude, cleanerLongitude, mes->sensor.latitude, mes->sensor.longitude)) {
+					maxImpact = util::distance(cleanerLatitude, cleanerLongitude, mes->sensor.latitude, mes->sensor.longitude);
+					cout << maxImpact << " " << mes->sensorID << endl;
+				}
+
+			}
+			
+		}
+
+		cout << maxImpact << endl;
+
+
+	}
+
+	while ((mes=mesReader->next())!=nullptr) {
+		mes->AfficherMesure();
+	}
 }

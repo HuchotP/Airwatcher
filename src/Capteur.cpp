@@ -4,14 +4,21 @@
 
 using namespace std;
 
-Capteur::Capteur(int ID, string lat, string lon, int userID) {
+Capteur::Capteur(int ID, double lat, double lon, int userID) {
     #ifdef MAP 
         cout << "Appel au constructeur de Capteur." << endl;
     #endif
     this->sensorID = ID;
-    this->latitude = stof(lat);
-    this->longitude = stof(lon);
+    this->latitude = lat;
+    this->longitude = lon;
     this->userID = userID;
+}
+
+Capteur::Capteur() {
+    #ifdef MAP 
+        cout << "Appel au constructeur vide de Capteur." << endl;
+    #endif
+    
 }
 /*
 Capteur::Capteur(Capteur & unCapteur) {

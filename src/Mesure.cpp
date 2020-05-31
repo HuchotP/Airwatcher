@@ -15,7 +15,6 @@ Mesure::Mesure(time_t time, int sID, string aID, float val, bool status)
 }
 
 Mesure::Mesure(const Mesure& mes) : timeStamp(mes.timeStamp), sensorID(mes.sensorID), attributeID(mes.attributeID), value(mes.value), status(mes.status) {
-
 }
 
 Mesure::Mesure() {

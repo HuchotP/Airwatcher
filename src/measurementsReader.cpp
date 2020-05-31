@@ -39,7 +39,7 @@ measurementsReader::measurementsReader(string nomFichier, char subdelim, vector<
 			string lat_c = current[1];
 			string long_c = current[2];
 			if (util::estDansRayon(localisation_value[0], localisation_value[1], rayon_value, stod(lat_c), stod(long_c))) {
-				Capteur c(stoi(current[0].substr(6)), current[1], current[2],true);
+				Capteur c(stoi(current[0].substr(6)), stod(current[1]), stod(current[2]),true);
 				acceptedSensors.push_back(c);
 			}
 			current = reader.next();

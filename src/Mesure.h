@@ -22,6 +22,7 @@ public :
     string attributeID ;
     float value ;
     bool status ;
+    Capteur sensor;
 
 };
 

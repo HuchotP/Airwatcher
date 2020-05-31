@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Agence::Agence(int id, measurementsReader reader) : Utilisateur(id)
+Agence::Agence(int id, measurementsReader & reader) : Utilisateur(id)
 {
     #ifdef MAP
         cout << "Appel au constructeur de Agence." << endl;

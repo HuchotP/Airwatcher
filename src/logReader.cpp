@@ -24,7 +24,7 @@ logReader::logReader (string nomFichier, char subdelim) : fichier(nomFichier.c_s
     nomfichier = nomFichier;
     delim = subdelim;
 	if(fichier.is_open()){
-		cout << "fichier ouvert" << endl;
+		//cout << "fichier ouvert" << endl;
 	}else{
 		cout << "erreur dans l'ouverture du fichier"<<endl;
 	}
