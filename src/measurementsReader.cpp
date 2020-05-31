@@ -110,11 +110,11 @@ Mesure* measurementsReader::next() {
 				cout << "strptime min_time : année : " << min_time.tm_year << " mois : " << min_time.tm_mon << " jour : " << min_time.tm_mday << endl;
 				cout << "mktime sensor :" << mktime(&time_sensor) << " mktime min : " << mktime(&min_time) << endl;
 				cout << "difftime: " << difftime(mktime(&time_sensor), mktime(&min_time)) << endl;
-*/			
+*/
 				Mesure* resultat = new Mesure(util::stringVectorToMesure(result));
 				return resultat;
 			}
-			
+
 		}
 		else{
 			tm time;
