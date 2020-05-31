@@ -357,6 +357,7 @@ int main(int argc, char* argv[])
 		double cleanerLatitude = stod(currentLine[1]);
 		double cleanerLongitude = stod(currentLine[2]);
 		double maxImpact = 0;
+		double distanceToSensor;
 		tm debutCleaner;
 		tm finCleaner;
 		strptime(currentLine[4].c_str(),"%d/%m/%Y %H:%M", &debutCleaner);
@@ -426,20 +427,24 @@ int main(int argc, char* argv[])
 			moyenne_O3_pendant = sum_O3/count_O3;
 			moyenne_PM_pendant = sum_PM/count_PM;
 
-			if(moyenne_NO3_pendant/moyenne_NO3_avant < 0.15 || moyenne_SO2_pendant/moyenne_SO2_avant < 0.15 || 
-			moyenne_O3_pendant/moyenne_O3_avant < 0.15 || moyenne_PM_pendant/moyenne_PM_avant < 0.15) {
+			bool impactCleaner = moyenne_NO3_pendant/moyenne_NO3_avant < 0.15 || moyenne_SO2_pendant/moyenne_SO2_avant < 0.15 || moyenne_O3_pendant/moyenne_O3_avant < 0.15 || moyenne_PM_pendant/moyenne_PM_avant < 0.15;
+			distanceToSensor = util::distance(cleanerLatitude, cleanerLongitude, mes->sensor.latitude, mes->sensor.longitude);
+
+			if(impactCleaner) {
 				
-				if(maxImpact < util::distance(cleanerLatitude, cleanerLongitude, mes->sensor.latitude, mes->sensor.longitude)) {
+				if(maxImpact < distanceToSensor) {
 					maxImpact = util::distance(cleanerLatitude, cleanerLongitude, mes->sensor.latitude, mes->sensor.longitude);
 					cout << maxImpact << " " << mes->sensorID << endl;
 				}
 
+			} else {
+				if(maxImpact > distanceToSensor) {
+					maxImpact = 0;
+					cout << "Conflit d'impacts " << distanceToSensor << " " << mes->sensorID << endl;
+					//return 0;
+				}
 			}
-			
 		}
-
-		cout << maxImpact << endl;
-
 
 	}
 
