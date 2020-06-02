@@ -12,6 +12,8 @@ using namespace std;
 #include <ctime>
 #include "../src/Mesure.h"
 #include "../src/logReader.h"
+#include "../src/usersReader.h"
+#include "../src/UtilisateurPrive.h"
 
 
 //--------------------------------------------------- Interfaces utilisées
@@ -39,14 +41,41 @@ public:
         return (acos(sin(lat_o*2*PI/360) * sin(lat_d*2*PI/360) + cos(lat_o*2*PI/360) * cos(lat_d*2*PI/360) * cos((long_d-long_o)*2*PI/360) ) *6378.137);
     }
 
+    static vector<Capteur> listerCapteurs(){
+
+        logReader logReaderCapteur("../data/sensors.csv", ';');
+        usersReader utilisateurs("./data/users.csv", ';');
+
+        vector<Capteur> liste;
+
+        vector<string> capteurData;
+        while((capteurData = logReader.next()) != nullptr){
+
+            vector<UtilisateurPrive*>::iterator it = utilisateurs.utilisateurs.begin();
+            while(it != utilisateurs.utilisateurs.end()){
+
+                if((*it)->idCapteur == stoi(stoi(capteurData[0]))){
+                    break;
+                }
+
+            }
+
+            liste.push_back(Capteur(stoi(capteurData[0]), stod(capteurData[1]), stod(capteurData[2])), (*it)->ID);
+
+        }
+
+    }
+
     static Mesure stringVectorToMesure(vector<string> vector_mesures) {
+
+        static vector<Capteur> mesCapteurs = listerCapteurs(); // c'est pour pas relire le fichier à chaque fois qu'on veut convertir une mesure
         logReader logReaderCapteur("./data/sensors.csv", ';');
         tm temps;
         strptime(vector_mesures[0].c_str(), "%Y-%m-%d %H", &temps);
         temps.tm_hour = 0;
         temps.tm_min = 0;
         temps.tm_sec = 0;
-        Mesure m(mktime(&temps), stoi(vector_mesures[1].substr(6)), vector_mesures[2], stof(vector_mesures[3]), true);
+        Mesure m(mktime(&temps), stoi(vector_mesures[1].substr(6)), vector_mesures[2], stod(vector_mesures[3]), true);
         vector<string> currentLine = logReaderCapteur.next();
         while(currentLine[0] != vector_mesures[1]) {
             currentLine = logReaderCapteur.next();

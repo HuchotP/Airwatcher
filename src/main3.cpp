@@ -345,28 +345,25 @@ int main(int argc, char* argv[])
 			mes->AfficherMesure();
 		}
 		mesReader->fichier.clear();
-    mesReader->fichier.seekg(0, ios::beg);
+    	mesReader->fichier.seekg(0, ios::beg);
 
 		usersReader* uReader = new usersReader(string("./data/users.csv"), ';');
 
-		vector <float> moy = Algorithm::moyenne(mesReader, uReader->utilisateurs);
+		vector <float> moy = Algorithm::moyenne(mesReader, uReader->sensorToUser);
 		cout <<"moyenne des mesures en O3 : "<<moy[0]<<endl;
 		cout <<"moyenne des mesures en SO2 : "<<moy[1]<<endl;
 		cout <<"moyenne des mesures en NO2 : "<<moy[2]<<endl;
 		cout <<"moyenne des mesures en PM10 : "<<moy[3]<<endl;
 
-//exemple d'une mesure a analyser pour vérifier si elle est fausse
-		tm temps;
-		strptime("2019-01-01 12:00:00", "%Y-%m-%d %H", &temps);
-		temps.tm_hour = 0;
-		temps.tm_min = 0;
-		temps.tm_sec = 0;
-		Mesure mesCheck(mktime(&temps), 70, "O3", 56.8, true);
-		Algorithm::identifierFausseDonnee(mesReader, mesCheck, uReader->utilisateurs);
+	while ((mes=mesReader->next())!=nullptr) {
+		Algorithm::identifierFausseDonnee(*mes, uReader->utilisateurs);
+	}
+		mesReader->fichier.clear();
+    	mesReader->fichier.seekg(0, ios::beg);
 
 		cout<<"Utilisateurs :"<<endl;
-		for (int i=0;i<uReader->utilisateurs.size();++i)
+		for(map<int,UtilisateurPrive*>::iterator it=uReader->sensorToUser.begin() ; it!=uReader->sensorToUser.end() ; ++it)
 		{
-			cout << "id : "<<uReader->utilisateurs[i]->getUserID()<<"   |   Points : "<<uReader->utilisateurs[i]->getPoints()<<"   |   Fiabilite : "<<uReader->utilisateurs[i]->getFiabilite()<<endl;
+			cout << "id : "<<it->second->getUserID()<<"   |   Points : "<<it->second->getPoints()<<"   |   Fiabilite : "<<it->second->getFiabilite()<<endl;
 		}
 }

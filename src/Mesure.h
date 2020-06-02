@@ -11,7 +11,7 @@ using namespace std;
 class Mesure
 {
 public :
-    Mesure(time_t time, int sID, string aID, float val, bool status);
+    Mesure(time_t time, int sID, string aID, double val, bool status);
     Mesure();
     Mesure(const Mesure& mes);
     ~Mesure();
@@ -20,7 +20,7 @@ public :
     time_t timeStamp ;
     int sensorID ;
     string attributeID ;
-    float value ;
+    double value ;
     bool status ;
     Capteur sensor;
 

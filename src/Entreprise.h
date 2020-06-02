@@ -6,6 +6,7 @@
 #include <vector>
 #include "Cleaner.h"
 #include "Utilisateur.h"
+#include "measurementsReader.h"
 
  using namespace std;
 
@@ -17,7 +18,7 @@
         void ajoutAirCleaner(Cleaner & c);
         float mesuresProchesAirCleaner(Cleaner & c);
         float moyenneAirCleaner (Cleaner & c);
-        float etendueZoneTraitee(Cleaner & c);
+        double etendueZoneTraitee(string cleanerId, measurementsReader & mesReader);
         float niveauAmelioration(Cleaner & c);
 
      private :

@@ -1,5 +1,6 @@
 #include "Algorithm.h"
 
+#include "UtilisateurPrive.h"
 using namespace std;
 
 
@@ -8,7 +9,7 @@ void Algorithm::capteursSimilaires(Capteur & capt) {
 
 }
 
-vector<float> Algorithm::moyenne(measurementsReader* mesReader, vector<UtilisateurPrive*> &utilisateurs) {
+vector<float> Algorithm::moyenne(measurementsReader* mesReader, map<int,UtilisateurPrive*> sensorToUser) {
     float moyenneO3=0;
     float moyenneSO2=0;
     float moyenneNO2=0;
@@ -18,6 +19,7 @@ vector<float> Algorithm::moyenne(measurementsReader* mesReader, vector<Utilisate
     vector<float> moyennes;
 
     Mesure* mes;
+
 		while ((mes=mesReader->next())!=nullptr) {
 
       string attribute = mes->attributeID;
@@ -36,18 +38,17 @@ vector<float> Algorithm::moyenne(measurementsReader* mesReader, vector<Utilisate
         ++nbPM10;
       }
 
-      vector<UtilisateurPrive*>::iterator it;
+      
       int sensorId = mes->sensorID;
-      it = find_if(utilisateurs.begin(), utilisateurs.end(), [&sensorId](const UtilisateurPrive* user) {return user->getIdCapteur() == sensorId;});
-      if(it!=utilisateurs.end()){
+	  
 
-        int userID = (*it)->getUserID();
-        if(userID != -1){
-            Algorithm::recompenserUtilisateur(utilisateurs, userID, recompense);
-        }
+      map<int,UtilisateurPrive*>::iterator it;
+		it = sensorToUser.find(sensorId);
+		if(it!=sensorToUser.end()){
+
+        Algorithm::recompenserUtilisateur(it->second, recompense);
+	     }
       }
-		}
-
     //remettre le curseur au debut du fichier
     mesReader->fichier.clear();
     mesReader->fichier.seekg(0, ios::beg);
@@ -72,31 +73,34 @@ vector<float> Algorithm::moyenne(measurementsReader* mesReader, vector<Utilisate
     }else{
       moyennes.push_back(-1.0);
     }
-
+    
     return moyennes;
 }
+        
 
-void Algorithm::identifierFausseDonnee(measurementsReader* mesReader, Mesure& mesureAExaminer, vector<UtilisateurPrive*> &utilisateurs) {
-    float facteurIncertitude = 1; //pour 68%
+void Algorithm::identifierFausseDonnee(Mesure& mesureAExaminer, map<int,UtilisateurPrive*> sensorToUser) {
+    float facteurIncertitude = 2; //pour 95%
+    unsigned int nMin = 30; //nombre de valeurs minimal à considérer que l'estimation soit correcte
 //trouver les mesures proches en tempes et en geographie
-    // vector<double> localisationVector;
-    // double rayon = 60;
-    // vector<int> t_value;
-  	// vector<tm> d_value;
-    // bool flag_d=false, flag_t=true; //recherches des mesures proches le meme jour
-    //
-    // localisationVector.push_back(mesureAExaminer.sensor.latitude);
-    // localisationVector.push_back(mesureAExaminer.sensor.longitude);
-    // t_value.push_back(0);
-    // t_value.push_back(0);
-    // t_value.push_back(1);
-    // t_value.push_back(0);
-    //
-    // measurementsReader* mesProchesReader = new measurementsReader(string("./data/measurementsTest.csv"), ';', localisationVector, rayon, t_value, flag_d, flag_t, d_value);
+    vector<double> localisationVector;
+    double rayon = 60;
+    vector<int> t_value;
+  	vector<tm> d_value;
+    bool flag_d=true, flag_t=false;
+    
+    localisationVector.push_back(mesureAExaminer.sensor.latitude);
+    localisationVector.push_back(mesureAExaminer.sensor.longitude);
 
+    //recherches des mesures proches le meme jour
+    tm* time;
+    time=localtime(&(mesureAExaminer.timeStamp));
+		d_value.push_back(*time);
+    time->tm_mday++;
+		d_value.push_back(*time);
 
-    //vector<float> moyenneDesMesures=Algorithm::moyenne(mesProchesReader,utilisateurs);
-    vector<float> moyenneDesMesures=Algorithm::moyenne(mesReader,utilisateurs);
+    measurementsReader* mesProchesReader = new measurementsReader(string("./data/measurementsTest.csv"), ';', localisationVector, rayon, t_value, flag_d, flag_t, d_value);
+
+    vector<float> moyenneDesMesures=Algorithm::moyenne(mesProchesReader,sensorToUser);
     float moy;
     if(mesureAExaminer.attributeID.compare("O3")==0){
       moy = moyenneDesMesures[0];
@@ -112,34 +116,44 @@ void Algorithm::identifierFausseDonnee(measurementsReader* mesReader, Mesure& me
     float sum = 0;
     Mesure* mes;
 
-    //while ((mes=mesProchesReader->next())!=nullptr) {
-    while ((mes=mesReader->next())!=nullptr) {
+    while ((mes=mesProchesReader->next())!=nullptr) {
         if(mes->attributeID.compare(mesureAExaminer.attributeID)==0){
           sum += pow((mes->value - moy),2);
           ++n;
         }
     }
 
-    float ecartType=sqrt(sum/n);
-    float borneInf = moy - ecartType*facteurIncertitude/sqrt(n);
-    float borneSup = moy + ecartType*facteurIncertitude/sqrt(n);
-    cout << "borneInf : "<<borneInf<<"   |   borneSup : "<<borneSup<<endl;
-    if(mesureAExaminer.value<borneInf ||mesureAExaminer.value>borneSup){
+    if(n>nMin){
+      float ecartType=sqrt(sum/n);
+      float borneInf = moy - ecartType*facteurIncertitude/sqrt(n);
+      float borneSup = moy + ecartType*facteurIncertitude/sqrt(n);
+      //cout << "borneInf : "<<borneInf<<"   |   borneSup : "<<borneSup<<endl;
+      if(mesureAExaminer.value<borneInf ||mesureAExaminer.value>borneSup){
         mesureAExaminer.status=false;
-        vector<UtilisateurPrive*>::iterator it;
+ 
         int sensorId = mesureAExaminer.sensorID;
-        it = find_if(utilisateurs.begin(), utilisateurs.end(), [&sensorId](const UtilisateurPrive* user) {return user->getIdCapteur() == sensorId;});
-        int userID = (*it)->getUserID();
-        utilisateurs[userID]->setFiabilite (utilisateurs[userID]->getFiabilite() - 1) ;
+
+        map<int,UtilisateurPrive*>::iterator it;
+		it = sensorToUser.find(sensorId);
+		if(it!=sensorToUser.end()){
+			it->second->setFiabilite(it->second->getFiabilite() - 1);
+		}
+		
+
         cout << "Mesure fausse : ";
         mesureAExaminer.AfficherMesure();
+      }
+    }else{
+      cout<<"Mesures insuffisantes pour déterminer si la mesure est fausse"<<endl;
     }
+
 }
 
 void Algorithm::impactAirCleaner() {
 
 }
 
-void Algorithm::recompenserUtilisateur(vector<UtilisateurPrive*> &utilisateurs, int userID, int recompense){
-    utilisateurs[userID]->setPoints(utilisateurs[userID]->getPoints() + recompense);
+void Algorithm::recompenserUtilisateur(UtilisateurPrive* utilisateur, int recompense){
+
+    utilisateur->setPoints(utilisateur->getPoints() + recompense);
 }

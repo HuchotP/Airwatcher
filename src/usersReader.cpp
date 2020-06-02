@@ -23,15 +23,14 @@ usersReader::usersReader(string nomFichier, char subdelim) :
     vector<string> current = logReader::next();
 
 		while (!current.empty()) {
-			string userId = current[0].substr(4);
-			string sensorId = current[1].substr(6);
-			//cout<< userId<<"   |   "<< sensorId<<endl;
-			UtilisateurPrive* user =new UtilisateurPrive(stoi(userId), stoi(sensorId));
-		 	//UtilisateurPrive user (stoi(userId), stoi(sensorId));
-		 	utilisateurs.push_back(user);
-
-			current = logReader::next();
-		}
+            string userId = current[0].substr(4);
+            string sensorId = current[1].substr(6);
+            //cout<< userId<<"   |   "<< sensorId<<endl;
+            UtilisateurPrive* user =new UtilisateurPrive(stoi(userId), stoi(sensorId));
+             //UtilisateurPrive user (stoi(userId), stoi(sensorId));
+            sensorToUser.insert(pair<int,UtilisateurPrive*>(stoi(sensorId),user));
+            current = logReader::next();
+        }
 }
 
 usersReader::~usersReader ( )

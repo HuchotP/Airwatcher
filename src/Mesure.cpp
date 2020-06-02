@@ -4,7 +4,7 @@
 #include "measurementsReader.h"
 using namespace std;
 
-Mesure::Mesure(time_t time, int sID, string aID, float val, bool status)
+Mesure::Mesure(time_t time, int sID, string aID, double val, bool status)
     : timeStamp(time), sensorID(sID), attributeID(aID), value(val), status(status)
 {
     #ifdef MAP

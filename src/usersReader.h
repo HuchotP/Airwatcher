@@ -32,7 +32,7 @@ public:
    usersReader (string nomFichier, char subdelim);
     ~usersReader ();
 
-    vector<UtilisateurPrive*> utilisateurs;
+    map<int,UtilisateurPrive*> sensorToUser;
 
 
 

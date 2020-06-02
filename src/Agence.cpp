@@ -1,52 +1,45 @@
 #include <iostream>
 #include <ctime>
 #include "Agence.h"
+#include <vector>
 
 using namespace std;
 
-Agence::Agence(int id, measurementsReader & reader) : Utilisateur(id)
-{
-    #ifdef MAP
-        cout << "Appel au constructeur de Agence." << endl;
-    #endif
-
-    this->dataReader = reader;
+Agence::Agence(int ID) : Utilisateur(ID) {
+  #ifdef MAP
+      cout << "Appel au constructeur de Agence." << endl;
+  #endif
 }
 
 Agence::~Agence()
-{
+{ 
     #ifdef MAP
     cout << "Appel au destructeur de <Agence>" << endl;
     #endif
 
 }
 
-void Agence::accederDonnees()
+void Agence::accederDonnees(measurementsReader& dataReader)
 {
     #ifdef MAP
         cout<<"Appel a la methode accederDonnees() de Agence" << endl;
     #endif
 
-    vector<string> data;
-
-    data = dataReader.next();
+    Mesure* data = dataReader.next();
 
     cout << "Timestamp | SensorId | Lat/Long | AttributeId | Value" << endl;
 
-    while(!data.empty()){
+    while(data!=NULL){
 
-        Mesure current = util::stringVectorToMesure(data);
+        tm * mesure_time = localtime(&(data->timeStamp));
 
-
-        tm * mesure_time = localtime(&current.timeStamp);
-
-        cout << mesure_time->tm_mday << "/" << mesure_time->tm_mon << "/" << mesure_time->tm_year << ":";
+        cout << mesure_time->tm_mday << "/" << (mesure_time->tm_mon+1) << "/" << (mesure_time->tm_year+1900) << ":";
         cout << mesure_time->tm_hour << ":" << mesure_time->tm_min << ":" << mesure_time->tm_sec;
 
-        cout << " | " << current.sensorID;
-        //cout << " | " << current.lat/long;
-        cout << " | " << current.attributeID;
-        cout << " | " << current.value << endl;
+        cout << " | " << data->sensorID;
+        cout << " | " << data->sensor.latitude << ", " << data->sensor.longitude;
+        cout << " | " << data->attributeID;
+        cout << " | " << data->value << endl;
 
 
         data = dataReader.next();
@@ -74,5 +67,3 @@ double Agence::moyenne()
     return 0.0;
 
 }
-
-

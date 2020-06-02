@@ -12,14 +12,14 @@ using namespace std;
 
 class Agence : public Utilisateur {
      public :
-        Agence(int id, measurementsReader reader);
+        Agence(int ID);
         Agence(Agence & uneAgence);
-        void accederDonnees();
+        ~Agence();
+        void accederDonnees(measurementsReader& dataReader);
         float evaluerCapteur (Capteur & capt);
         double moyenne();
         void comportementSimilaire(Capteur & capt);
 
-        measurementsReader dataReader;
  };
 
  #endif
