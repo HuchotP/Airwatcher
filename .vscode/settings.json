@@ -40,6 +40,9 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "ctime": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "map": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp"
     }
 }

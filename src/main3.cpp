@@ -338,32 +338,46 @@ int main(int argc, char* argv[])
 		//init measurementsReader avec recherche date
 	}
 
-		mesReader = new measurementsReader(string("./data/measurementsTest.csv"), ';', localisationVector, rayonEffectif, t_value, flag_d, flag_t, d_value);
+		mesReader = new measurementsReader(string("./data/measurements.csv"), ';', localisationVector, rayonEffectif, t_value, flag_d, flag_t, d_value);
 
 		Mesure* mes;
-		while ((mes=mesReader->next())!=nullptr) {
-			mes->AfficherMesure();
-		}
-		mesReader->fichier.clear();
-    	mesReader->fichier.seekg(0, ios::beg);
+		// while ((mes=mesReader->next())!=nullptr) {
+		// 	mes->AfficherMesure();
+		// }
+		// mesReader->fichier.clear();
+    // mesReader->fichier.seekg(0, ios::beg);
 
 		usersReader* uReader = new usersReader(string("./data/users.csv"), ';');
 
-		vector <float> moy = Algorithm::moyenne(mesReader, uReader->sensorToUser);
-		cout <<"moyenne des mesures en O3 : "<<moy[0]<<endl;
-		cout <<"moyenne des mesures en SO2 : "<<moy[1]<<endl;
-		cout <<"moyenne des mesures en NO2 : "<<moy[2]<<endl;
-		cout <<"moyenne des mesures en PM10 : "<<moy[3]<<endl;
+		//vector <double> moy = Algorithm::moyenne(mesReader, uReader->sensorToUser);
+		//cout <<"moyenne des mesures en O3 : "<<moy[0]<<endl;
+		//cout <<"moyenne des mesures en SO2 : "<<moy[1]<<endl;
+		//cout <<"moyenne des mesures en NO2 : "<<moy[2]<<endl;
+		//cout <<"moyenne des mesures en PM10 : "<<moy[3]<<endl;
 
-	while ((mes=mesReader->next())!=nullptr) {
-		Algorithm::identifierFausseDonnee(*mes, uReader->utilisateurs);
-	}
+//exemple d'une mesure a analyser pour vérifier si elle est fausse
+		// tm temps;
+		// strptime("2019-04-10 12:00:00", "%Y-%m-%d %H", &temps);
+		// temps.tm_hour = 0;
+		// temps.tm_min = 0;
+		// temps.tm_sec = 0;
+		// Mesure mesCheck(mktime(&temps), 70, "O3", 56.8, true);
+		// Algorithm::identifierFausseDonnee(mesCheck, uReader->utilisateurs);
+
+		while ((mes=mesReader->next())!=nullptr) {
+			 cout<<"analyse de la mesure : ";
+			 mes->AfficherMesure();
+			Algorithm::identifierFausseDonnee(*mes, uReader->sensorToUser);
+		}
 		mesReader->fichier.clear();
-    	mesReader->fichier.seekg(0, ios::beg);
+    mesReader->fichier.seekg(0, ios::beg);
 
 		cout<<"Utilisateurs :"<<endl;
-		for(map<int,UtilisateurPrive*>::iterator it=uReader->sensorToUser.begin() ; it!=uReader->sensorToUser.end() ; ++it)
-		{
-			cout << "id : "<<it->second->getUserID()<<"   |   Points : "<<it->second->getPoints()<<"   |   Fiabilite : "<<it->second->getFiabilite()<<endl;
-		}
+        for(map<int,UtilisateurPrive*>::iterator it=uReader->sensorToUser.begin() ; it!=uReader->sensorToUser.end() ; ++it)
+        {
+            cout << "id : "<<it->second->getUserID()<<"   |   Points : "<<it->second->getPoints()<<"   |   Fiabilite : "<<it->second->getFiabilite()<<endl;
+        }
+
+		delete uReader;
+		delete mesReader;
 }

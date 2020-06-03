@@ -11,8 +11,8 @@ using namespace std;
 #include "logReader.h"
 #include "Mesure.h"
 #include "UtilisateurPrive.h"
-#include "UtilisateurPrive.h"
 #include <algorithm>
+#include <map>
 
 //--------------------------------------------------- Interfaces utilisées
 

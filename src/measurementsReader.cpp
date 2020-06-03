@@ -39,6 +39,7 @@ measurementsReader::measurementsReader(string nomFichier, char subdelim, vector<
 			string lat_c = current[1];
 			string long_c = current[2];
 			if (util::estDansRayon(localisation_value[0], localisation_value[1], rayon_value, stod(lat_c), stod(long_c))) {
+				cout << "Le capteur " <<  stoi(current[0].substr(6)) << "est dans la zone demandée, distanceToSensor :" << util::distance(localisation_value[0], localisation_value[1], stod(lat_c), stod(long_c)) << " rayon  :"<< rayon_value << endl;
 				Capteur c(stoi(current[0].substr(6)), stod(current[1]), stod(current[2]),true);
 				acceptedSensors.push_back(c);
 			}
@@ -80,8 +81,7 @@ Mesure* measurementsReader::next() {
 			time.tm_sec = 0;
 			time.tm_min = 0;
 			if (time.tm_year >= date_value[0].tm_year && time.tm_year <= date_value[1].tm_year &&
-				time.tm_mon >= date_value[0].tm_mon && time.tm_mon <= date_value[1].tm_mon &&
-				time.tm_mday >= date_value[0].tm_mday && time.tm_mday <= date_value[1].tm_mday) {
+				time.tm_yday >= date_value[0].tm_yday && time.tm_yday <= date_value[1].tm_yday) {
 				Mesure* resultat = new Mesure(util::stringVectorToMesure(result));
 				return resultat;
 			}

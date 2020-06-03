@@ -1,6 +1,9 @@
 #include <iostream>
 #include <ctime>
 #include "Agence.h"
+#include "Algorithm.h"
+#include "usersReader.h"
+#include "../lib/util.h"
 #include <vector>
 
 using namespace std;
@@ -12,7 +15,7 @@ Agence::Agence(int ID) : Utilisateur(ID) {
 }
 
 Agence::~Agence()
-{ 
+{
     #ifdef MAP
     cout << "Appel au destructeur de <Agence>" << endl;
     #endif
@@ -58,12 +61,20 @@ float Agence::evaluerCapteur(Capteur & capt)
 
 }
 
-double Agence::moyenne()
+void Agence::statistiques(measurementsReader& dataReader)
 {
     #ifdef MAP
         cout<<"Appel a la methode moyenne() de Agence" << endl;
     #endif
 
-    return 0.0;
 
+    usersReader utilisateurs("./data/users.csv", ';');
+
+    vector<vector<double>> statistiques = Algorithm::statistiques(&dataReader, utilisateurs.sensorToUser);
+
+    cout << "Indices de la qualité de l'air par polluant : " << endl;
+    util::printStats("03", statistiques[0]);
+    util::printStats("SO2", statistiques[1]);
+    util::printStats("NO2", statistiques[2]);
+    util::printStats("PM10", statistiques[3]);
 }

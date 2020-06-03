@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <limits>
+#include <map>
 #include "Entreprise.h"
 #include "Cleaner.h"
 #include "logReader.h"
@@ -12,7 +14,6 @@ Entreprise::Entreprise(int ID, string nom) : Utilisateur(ID) {
     #ifdef MAP 
         cout << "Appel au constructeur de Entreprise." << endl;
     #endif
-    this->userID = ID;
     this->name = nom;
 }
 
@@ -22,7 +23,6 @@ Entreprise::Entreprise(Entreprise & uneEntreprise) : Utilisateur(uneEntreprise) 
     #endif
     this->name = uneEntreprise.name;
     this->tabCleaner = uneEntreprise.tabCleaner;
-    this->userID = uneEntreprise.userID;
 }
 
 Entreprise::~Entreprise() {
@@ -61,6 +61,7 @@ double Entreprise::etendueZoneTraitee(string cleanerId, measurementsReader & mes
     vector<string> currentLine;
     currentLine = logReaderCleaner.next();
     while(currentLine[0] != cleanerId) {
+        cout << "cherche cleaner" << endl;
         currentLine = logReaderCleaner.next();
         if(currentLine.empty()) {
             cerr << "Cleaner introuvable" << endl;
@@ -70,6 +71,9 @@ double Entreprise::etendueZoneTraitee(string cleanerId, measurementsReader & mes
     double cleanerLatitude = stod(currentLine[1]);
     double cleanerLongitude = stod(currentLine[2]);
     double maxImpact = 0;
+    double minNonImpact = numeric_limits<double>::max();
+    multimap<double,bool> listeImpacts;
+    listeImpacts.insert(pair<double,bool>(0,true));
     double distanceToSensor;
     tm debutCleaner;
     tm finCleaner;
@@ -86,6 +90,7 @@ double Entreprise::etendueZoneTraitee(string cleanerId, measurementsReader & mes
     double moyenne_SO2_pendant, moyenne_NO3_pendant, moyenne_O3_pendant, moyenne_PM_pendant;
 
     while ((mes=mesReader.next())!=nullptr) {
+        // mes->AfficherMesure();
         tm * timeMesure = localtime(&(mes->timeStamp));
         
         if(timeMesure->tm_yday > finCleaner.tm_yday) continue;
@@ -115,10 +120,10 @@ double Entreprise::etendueZoneTraitee(string cleanerId, measurementsReader & mes
         moyenne_NO3_avant = sum_NO3/count_NO3;
         moyenne_O3_avant = sum_O3/count_O3;
         moyenne_PM_avant = sum_PM/count_PM;
-
-        /* cout << "sommes : " << sum_SO2<< " " << sum_NO3<< " " << sum_O3<< " " << sum_PM<< " " << endl;
+/* 
+        cout << "sommes : " << sum_SO2<< " " << sum_NO3<< " " << sum_O3<< " " << sum_PM<< " " << endl;
         cout << "comptes : " << count_SO2<< " " << count_NO3<< " " << count_O3<< " " << count_PM<< " " << endl;
-*/
+ */
         sum_SO2 = sum_NO3 = sum_O3 = sum_PM = 0;
         count_SO2 = count_NO3 = count_O3 = count_PM = 0;
 
@@ -156,27 +161,7 @@ double Entreprise::etendueZoneTraitee(string cleanerId, measurementsReader & mes
 
         bool impactCleaner = moyenne_NO3_pendant/moyenne_NO3_avant < 0.34 || moyenne_SO2_pendant/moyenne_SO2_avant < 0.34 || moyenne_O3_pendant/moyenne_O3_avant < 0.34 || moyenne_PM_pendant/moyenne_PM_avant < 0.34;
         distanceToSensor = util::distance(cleanerLatitude, cleanerLongitude, mes->sensor.latitude, mes->sensor.longitude);
-
-        if(impactCleaner) {
-            
-            cout << distanceToSensor << " " << mes->sensorID << endl;
-            cout << moyenne_NO3_pendant/moyenne_NO3_avant << " " << moyenne_SO2_pendant/moyenne_SO2_avant << " " << moyenne_O3_pendant/moyenne_O3_avant << " " << moyenne_PM_pendant/moyenne_PM_avant << " " << endl;
-            
-            if(maxImpact < distanceToSensor) {
-                maxImpact = distanceToSensor;
-                cout << "seuil augmenté" << endl;
-            }
-
-        } else {
-            if(maxImpact > distanceToSensor) {
-                maxImpact = 0;
-                outliers++;
-                cout << "Conflit d'impacts " << distanceToSensor << " " << mes->sensorID << endl;
-                
-                cout << moyenne_NO3_pendant/moyenne_NO3_avant << " " << moyenne_SO2_pendant/moyenne_SO2_avant << " " << moyenne_O3_pendant/moyenne_O3_avant << " " << moyenne_PM_pendant/moyenne_PM_avant << " " << endl;
-                break;
-            }
-        }
+        listeImpacts.insert(pair<double,bool>(distanceToSensor, impactCleaner));
         // boucle pour passer au capteur suivant 
         int currentSensor = mes->sensorID;
         while(mes->sensorID == currentSensor) {
@@ -185,12 +170,17 @@ double Entreprise::etendueZoneTraitee(string cleanerId, measurementsReader & mes
 
     }
 
-    if(maxImpact != 0) {
-        cout << "Votre cleaner a un rayon d'impact estimé à : " << maxImpact << " kilomètres." << endl;
+    multimap<double,bool>::iterator it = listeImpacts.begin();
+    while(it->second != false && it!= listeImpacts.end()) {
+        ++it;
+    }
+    if(it != listeImpacts.end()) {
+        --it;
+        cout << "Votre cleaner a un rayon d'impact estimé à : " << it->first << " kilomètres." << endl;
     } else {
         cout << "Nous n'avons pas pu démontrer l'efficacité de votre cleaner." << endl;
     }
-    return maxImpact;
+    return it->first;
 }
 
 float Entreprise::niveauAmelioration(Cleaner & c) {

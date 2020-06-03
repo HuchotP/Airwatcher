@@ -24,6 +24,5 @@
      private :
         string name;
         vector<Cleaner> tabCleaner;
-        int userID;
  };
   #endif

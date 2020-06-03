@@ -17,7 +17,7 @@ class Agence : public Utilisateur {
         ~Agence();
         void accederDonnees(measurementsReader& dataReader);
         float evaluerCapteur (Capteur & capt);
-        double moyenne();
+        void statistiques(measurementsReader& dataReader);
         void comportementSimilaire(Capteur & capt);
 
  };

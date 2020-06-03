@@ -28,7 +28,7 @@ int Utilisateur::getUserID() {
     #ifdef MAP
         cout<<"Appel a la methode getUserID() de Utilisateur" << endl;
     #endif 
-    return userid;
+    return this->userid;
 }
 
 void Utilisateur::creerCompte() {

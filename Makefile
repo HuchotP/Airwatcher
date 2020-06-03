@@ -4,7 +4,7 @@ CFLAGS = -g -Wall
 
 LIBS = -lm
 
-DEP = ./src/Agence.cpp ./src/Capteur.cpp ./src/Cleaner.cpp ./src/Entreprise.cpp ./src/logReader.cpp ./src/measurementsReader.cpp ./src/Mesure.cpp ./src/Utilisateur.cpp ./src/UtilisateurPrive.cpp ./src/main.cpp
+DEP = ./src/Agence.cpp ./src/Capteur.cpp ./src/Cleaner.cpp ./src/Entreprise.cpp ./src/logReader.cpp ./src/usersReader.cpp ./src/measurementsReader.cpp ./src/Mesure.cpp ./src/Utilisateur.cpp ./src/UtilisateurPrive.cpp ./src/main.cpp ./src/Algorithm.cpp
 all: Airwatcher
 
 Airwatcher: $(DEP)

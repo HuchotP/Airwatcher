@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
 		if (options[RAYON]) {
 			rayon = options[RAYON].arg;
 			char* end3;
-			double rayonEffectif = strtod(rayon.c_str(),&end3);
+			rayonEffectif = strtod(rayon.c_str(),&end3);
 			cout << rayonEffectif << endl;
 			flag_l = true;
 		}
@@ -341,6 +341,11 @@ int main(int argc, char* argv[])
 		
 		Entreprise entr(0, "Disneylandent");
 		entr.etendueZoneTraitee(options[IMPACT].arg, mesReader);
+	}
+	else if(options[QUALITE]){
+
+		Agence agence(0);
+		agence.statistiques(mesReader);
 
 	}else{
 
